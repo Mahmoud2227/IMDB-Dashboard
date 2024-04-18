@@ -1,7 +1,7 @@
 dash
 dash_bootstrap_components
 openpyxl
-sklearn
+scikit-learn
 numpy
 pandas
 plotly
