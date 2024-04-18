@@ -1,7 +1,7 @@
 dash
 dash_bootstrap_components
 openpyxl
-wordcloud
+sklearn
 numpy
 pandas
 plotly
