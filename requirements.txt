@@ -1,5 +1,6 @@
 dash
 dash_bootstrap_components
+openpyxl
 wordcloud
 numpy
 pandas
