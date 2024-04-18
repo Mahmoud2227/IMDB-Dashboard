@@ -1,4 +1,6 @@
 dash
+dash_bootstrap_components
+wordcloud
 numpy
 pandas
 plotly
