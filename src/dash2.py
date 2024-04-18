@@ -4,7 +4,7 @@ def generate_visualizations(series, splits):
     fig_donut1 = px.pie(top_five_genres, 
                              names='creators',  
                              values='count', 
-                             title='Top Five creators  - Donut Chart',
+                             title='Top Three creators  - Donut Chart',
                              
                              hole=0.5)
     fig_donut1.update_layout(template='plotly_dark', font=dict(color='yellow'))

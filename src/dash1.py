@@ -1,10 +1,5 @@
-from dash import html
 import plotly.express as px
-from wordcloud import WordCloud
-import base64
-from io import BytesIO
 
-# Define visualizations
 def generate_visualizations(series, splits):
     top_five_genres = series["parentalguide"].value_counts().head(10).reset_index(name='count')
     fig_treemap = px.treemap(top_five_genres, 
@@ -13,17 +8,6 @@ def generate_visualizations(series, splits):
                              title='Top Five Parental Guides - Treemap',
                              color='count',color_continuous_scale='viridis')
     fig_treemap.update_layout(template='plotly_dark', font=dict(color='yellow'))
-
-    text_data = ' '.join(series['description'].astype(str))
-    wordcloud = WordCloud(width=687, height=450, background_color='black').generate(text_data)
-    wordcloud_image = wordcloud.to_image()
-
-    # Save the word cloud image as base64 encoded string
-    buffer = BytesIO()
-    wordcloud_image.save(buffer, format='PNG')
-    wordcloud_b64 = base64.b64encode(buffer.getvalue()).decode('utf-8')
-
-    fig_wordcloud = html.Img(src='data:image/png;base64,{}'.format(wordcloud_b64))
 
     top_values_language = splits["genre"]["genre"].value_counts().head(10).reset_index(name='count')
     total_count_language = top_values_language['count'].sum()
@@ -77,9 +61,15 @@ def generate_visualizations(series, splits):
                                     locations="country",
                                     color="count",
                                     hover_name="country",
-                                    title="Choropleth Map of User Percent by Country",
+                                    title="Country Map",
                                     projection="natural earth",
                                     color_continuous_scale='Viridis')
     fig_choropleth.update_layout(template='plotly_dark', font=dict(color='yellow'))
+    
+    # Generate box plot for ratings
+    fig_boxplot = px.box(series, x="rating", title='Box Plot for Ratings')
+    fig_boxplot.update_traces(marker=dict(color='yellow'))
+    fig_boxplot.update_layout(template='plotly_dark', font=dict(color='yellow'))
 
-    return fig_treemap, fig_wordcloud, fig_bar_language, fig_choropleth
+
+    return fig_treemap, fig_bar_language, fig_choropleth, fig_boxplot
