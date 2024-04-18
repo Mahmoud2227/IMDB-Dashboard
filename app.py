@@ -106,7 +106,7 @@ def update_tab(tab,tab2):
     data, splits = load_data(tab2)
 
     if tab == 'overview':
-        fig1, fig2, fig3, fig4 = generate_visualizations2(data, splits)
+        fig1, fig2, fig3, fig4 = generate_visualizations1(data, splits)
         return html.Div([
         html.Div([
             dcc.Graph(id='graph1', figure=fig1),
