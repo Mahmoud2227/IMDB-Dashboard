@@ -3,6 +3,8 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
+from src.const import get_constants
+
 from src.dash1 import generate_visualizations as generate_visualizations1
 from src.dash2 import generate_visualizations as generate_visualizations2
 from src.dash3 import generate_visualizations as generate_visualizations3
@@ -13,17 +15,15 @@ movies_splits = pd.read_excel("./splits_movie.xlsx", sheet_name=None)
 series = pd.read_csv('./series_after_cleaning.csv')
 series_splits = pd.read_excel("./splits_series.xlsx", sheet_name=None)
 
-numofcountries=len(movies_splits["country"]["country"].groupby(movies_splits["country"]["country"]).count().sort_values(ascending=False).index)
-numoflang=len(movies_splits["language"]["language"].groupby(movies_splits["language"]["language"]).count().sort_values(ascending=False).index)
-numofmoives=movies.shape[0]+series.shape[0]
-avgvotes=int(movies["votes"].mean()+series["votes"].mean())
-
 # Define function to load data based on tab selection
 def load_data(tab):
     if tab == 'movie':
         return movies, movies_splits
     elif tab == 'series':
         return series, series_splits
+
+num_of_works,num_of_countries,num_of_lang,avg_votes = get_constants(movies, series, movies_splits, series_splits)
+
 
 # Initialize the app
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -34,8 +34,8 @@ def generate_stats_card (title, value, image_path):
         dbc.Card([
             dbc.CardImg(src=image_path, top=True, style={'width': '50px','alignSelf': 'center'}),
             dbc.CardBody([
-                html.P(value, className="card-value", style={'margin': '0px'}),
-                html.H4(title, className="card-title")
+                html.P(value, className="card-value", style={'margin': '0px','fontSize': '22px','fontWeight': 'bold'}),
+                html.H4(title, className="card-title", style={'margin': '0px','fontSize': '18px','fontWeight': 'bold'})
             ], style={'textAlign': 'center'}),
         ], style={'paddingBlock':'10px',"backgroundColor":'#deb522','border':'none','borderRadius':'10px'})
     )
@@ -73,6 +73,7 @@ MAX_OPTIONS_DISPLAY = 3300
 dropdown_options_movie = [{'label': title, 'value': title} for title in movies['title'][:MAX_OPTIONS_DISPLAY]]
 dropdown_options_series = [{'label': title, 'value': title} for title in series['title'][:MAX_OPTIONS_DISPLAY]]
 
+
 offcanvas = html.Div(
     [
         dbc.Button("Movie Recommendation", id="open-movie-offcanvas", n_clicks=0, style={'backgroundColor':'#deb522','color':'black','fontWeight': 'bold','border':'none'}),
@@ -81,9 +82,10 @@ offcanvas = html.Div(
             id='movie-dropdown',
             options=dropdown_options_movie,
             placeholder='Select a movie...',
-            searchable=True
+            searchable=True,
+            style={'color':'black'}
             ),
-            html.Div(id='movie-recommendation-content')]),
+            dcc.Loading(html.Div(id='movie-recommendation-content'),type='circle',color='#deb522',style={'marginTop': '60px'})]),
             id="movie-recommendation-offcanvas",
             title="Movie Recommendations",
             is_open=False,
@@ -95,9 +97,10 @@ offcanvas = html.Div(
             id='series-dropdown',
             options=dropdown_options_series,
             placeholder='Select a series...',
-            searchable=True
+            searchable=True,
+            style={'color':'black'}
             ),
-            html.Div(id='series-recommendation-content')]),
+            dcc.Loading(html.Div(id='series-recommendation-content'),type='circle',color='#deb522',style={'marginTop': '60px'})]),
             id="series-recommendation-offcanvas",
             title="Series Recommendations",
             is_open=False,
@@ -123,10 +126,11 @@ app.layout = html.Div([
             dbc.Col(offcanvas, width=4)
         ]),
         dbc.Row([
-            dbc.Col(generate_stats_card("Work",numofmoives,"./assets/movie-icon.png"), width=3,style={'paddingRight': '5px'}),
-            dbc.Col(generate_stats_card("Language", numoflang,"./assets/language-icon.svg"), width=3,style={'padding': '5px'}),
-            dbc.Col(generate_stats_card("Country",numofcountries,"./assets/country-icon.png"), width=3,style={'padding': '5px'}),
-            dbc.Col(generate_stats_card("Average Votes",avgvotes,"./assets/vote-icon.png"), width=3,style={'paddingLeft': '5px'}),
+            
+            dbc.Col(generate_stats_card("Work",num_of_works,"./assets/movie-icon.png"), width=3),
+            dbc.Col(generate_stats_card("Language", num_of_lang,"./assets/language-icon.svg"), width=3),
+            dbc.Col(generate_stats_card("Country",num_of_countries,"./assets/country-icon.png"), width=3),
+            dbc.Col(generate_stats_card("Average Votes",avg_votes,"./assets/vote-icon.png"), width=3),
         ],style={'marginBlock': '10px'}),
         dbc.Row([
             dcc.Tabs(id='tabs', value='movie', children=[
@@ -200,11 +204,13 @@ def update_recommendation_movie(selected_movie):
     if selected_movie:
         x = []
         for i in range(0, 5):
-            x.append(movies[movies["title"] == get_recommendations(movies,indices,selected_movie,cosine_sim).iloc[i]]["title"])
+            x.append(movies[movies["title"] == get_recommendations(movies,indices,selected_movie,cosine_sim).iloc[i]][["link","title"]])
     else:
         return []
+    
     return html.Div(children=[
-            html.P(i,style={'color': '#deb522'}) for i in x
+            dcc.Link(f"{i+1} - {data['title'].values[0]}", href=data['link'].values[0], style={'display':'block','color':'#deb522','marginBlock':'10px'}
+                    ,target='_blank') for i, data in enumerate(x)
     ],style={'marginTop': '10px','textAlign': 'center','color': '#deb522'})
 
 @app.callback(
@@ -213,7 +219,7 @@ def update_recommendation_movie(selected_movie):
 )
 def update_recommendation_series(selected_series):
     df = series.copy()
-    df["word_cloud"]=series["description"]+" "+series["genre"]+" "+series["creators"]+" "+series["stars"]+" "+series["country"]
+    df["word_cloud"]=series["description"]+" "+series["genre"]+" "+series["creators"]+" "+series["stars"]+" "+series["country"] +" "+ series['production_company'] +" "+ series['parentalguide']
     tfidf = TfidfVectorizer(stop_words='english')
     df["word_cloud"] = df["word_cloud"].fillna('')  
     tfidf_matrix = tfidf.fit_transform(df['word_cloud'])
@@ -223,12 +229,14 @@ def update_recommendation_series(selected_series):
     if selected_series:
         x = []
         for i in range(0, 5):
-            x.append(series[series["title"] == get_recommendations(series,indices,selected_series,cosine_sim).iloc[i]]["title"])
+            x.append(series[series["title"] == get_recommendations(series,indices,selected_series,cosine_sim).iloc[i]][["link", "title"]])
     else:
         return []
     return html.Div(children=[
-            html.P(i,style={'color': '#deb522'}) for i in x
+            dcc.Link(f"{i+1} - {data['title'].values[0]}", href=data['link'].values[0], style={'display':'block','color':'#deb522','marginBlock':'10px'}
+                    ,target='_blank') for i, data in enumerate(x)
     ],style={'marginTop': '10px','textAlign': 'center','color': '#deb522'})
+
 
 @app.callback(
     Output('tabs-content', 'children'),
@@ -292,4 +300,4 @@ def update_tab(tab,tab2):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True, dev_tools_hot_reload=True)

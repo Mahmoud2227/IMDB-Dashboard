@@ -5,7 +5,7 @@ def generate_visualizations(series, splits):
     fig_treemap = px.treemap(top_five_genres, 
                              path=['parentalguide'],  
                              values='count', 
-                             title='Top Five Parental Guides - Treemap',
+                             title='Top Parental Guides',
                              color='count',color_continuous_scale='viridis')
     fig_treemap.update_layout(template='plotly_dark', font=dict(color='yellow'))
 
@@ -61,13 +61,13 @@ def generate_visualizations(series, splits):
                                     locations="country",
                                     color="count",
                                     hover_name="country",
-                                    title="Country Map",
+                                    title="Top Countries producing",
                                     projection="natural earth",
                                     color_continuous_scale='Viridis')
     fig_choropleth.update_layout(template='plotly_dark', font=dict(color='yellow'))
     
     # Generate box plot for ratings
-    fig_boxplot = px.box(series, x="rating", title='Box Plot for Ratings')
+    fig_boxplot = px.box(series, x="rating", title='Ratings Distribution')
     fig_boxplot.update_traces(marker=dict(color='yellow'))
     fig_boxplot.update_layout(template='plotly_dark', font=dict(color='yellow'))
 

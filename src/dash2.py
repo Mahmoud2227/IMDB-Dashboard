@@ -4,7 +4,7 @@ def generate_visualizations(series, splits):
     fig_donut1 = px.pie(top_five_genres, 
                              names='creators',  
                              values='count', 
-                             title='Top Three creators  - Donut Chart',
+                             title='Top creators',
                              
                              hole=0.5)
     fig_donut1.update_layout(template='plotly_dark', font=dict(color='yellow'))
@@ -17,6 +17,7 @@ def generate_visualizations(series, splits):
                              title='Top Productions Company',
                              labels={'count': 'Count', 'index': 'Production Company', 'percentage': 'Percentage'})
     fig_bar_country.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig_bar_country.update_layout(yaxis_title='Production Company')
     fig_bar_country.update_layout(yaxis=dict(categoryorder='total ascending'))
     fig_bar_country.update_layout(template='plotly_dark', font=dict(color='yellow'))
 
