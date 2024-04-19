@@ -3,7 +3,7 @@
 This repository contains code for an IMDb dashboard built using Dash and Plotly. The dashboard allows users to explore IMDb data, visualize trends, and get recommendations for movies and series.
 
 
-![IMDb Dashboard](assets\dashboard_Screenshot.jpeg)
+![IMDb Dashboard](assets/dashboard_Screenshot.jpeg)
 
 ## Features
 
