@@ -26,7 +26,7 @@ num_of_works,num_of_countries,num_of_lang,avg_votes = get_constants(movies, seri
 
 
 # Initialize the app
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], title='IMDB Data Analysis Dashboard')
 server = app.server
 
 def generate_stats_card (title, value, image_path):
@@ -300,4 +300,4 @@ def update_tab(tab,tab2):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True, dev_tools_hot_reload=True)
+    app.run_server(debug=False)
