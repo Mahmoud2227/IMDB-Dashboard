@@ -15,7 +15,7 @@ This repository contains code for an IMDb dashboard built using Dash and Plotly.
 
 ## Deployment
 
-The project is deployed and accessible at [https://imdb-dashboard.onrender.com](https://imdb-dashboard.onrender.com).
+The project is deployed and accessible at [https://imdb-dashboard.onrender.com](https://imdb-dashboard.onrender.com) or [https://mahmoud2227.pythonanywhere.com/](https://mahmoud2227.pythonanywhere.com/).
 
 ## Components
 
